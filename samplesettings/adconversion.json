@@ -1,0 +1,10 @@
+{
+"Format":"AD2500",
+"Modules":[
+{"File":"PRINT.ASM","abr":"PM","Renames":[
+	"LINES_PER_PAGE"
+]}
+],
+"Macros":[],
+"EmitOriginal":true
+}
