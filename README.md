@@ -5,9 +5,9 @@ Convert 6502 Assembler source from
 * Programmers Development System (PDS) 
 to ACME Cross Assembler.
 
-# Written in .NET Core 3, runnable on Windows 10, MacOS, and Linux
+## Written in .NET Core 3, runnable on Windows 10, MacOS, and Linux
 
-## This is a simple line-by-line converter designed to read 6502 Assembly Language source and emit source that can be assembled using the ACME cross assembler.
+### This is a simple line-by-line converter designed to read 6502 Assembly Language source and emit source that can be assembled using the ACME cross assembler.
 Visual Studio Code has an excellent extension for working with the ACME Cross assembler.   [ACME VS ode Extension](https://marketplace.visualstudio.com/items?itemName=TonyLandi.acmecrossassembler)
 
 The conversion does not support all features, just enough to get my source code translated.  The most signification limitations are:
