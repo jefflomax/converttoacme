@@ -8,7 +8,7 @@ to ACME Cross Assembler.
 ## Written in .NET Core 3, runnable on Windows 10, MacOS, and Linux
 
 ### This is a simple line-by-line converter designed to read 6502 Assembly Language source and emit source that can be assembled using the ACME cross assembler.
-Visual Studio Code has an excellent extension for working with the ACME Cross assembler.   [ACME VS ode Extension](https://marketplace.visualstudio.com/items?itemName=TonyLandi.acmecrossassembler)
+Visual Studio Code has an excellent extension for working with the ACME Cross assembler.   [ACME VS Code Extension](https://marketplace.visualstudio.com/items?itemName=TonyLandi.acmecrossassembler)
 
 The conversion does not support all features, just enough to get my source code translated.  The most signification limitations are:
 * Very little support for macros, only simple parameterless macros in PDS right now
@@ -31,12 +31,12 @@ See the samplesetting folder for some simple examples
   {
     "File":"FILENAME.ASM",
     "abr":"XX", // Prefix to uniquify a colliding symbol
-    "Renames":[
-      "SYMBOL_TO_UNIQUIFY", ...
+    "Renames": [
+      "SYMBOL_TO_UNIQUIFY", . . .
     ]
-    }, ...
+    }, . . .
 ],
-"Macros":["MacroName",...],
+"Macros":["MacroName", . . . ],
 "EmitOriginal":true // Emit a copy of modified lines as a comment
 }
 ```
