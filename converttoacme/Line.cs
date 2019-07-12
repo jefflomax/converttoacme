@@ -155,6 +155,20 @@ namespace acmeconvert
 				}
 			}
 
+			// This is a hack.  Probably need to master conditional
+			// RegEx so when we match an opcode, we don't try to match
+			// any directive.  The basic problem is that a directive 
+			// name could also be the operand of a opcode, as in:
+			//  STA PAGE
+			// Worse, in a case like PAGE, the code wants to skip
+			// the entire line.
+			if (OpCode.Length > 0)
+			{
+				Directive = string.Empty;
+				drcIndex = 0;
+				drcLength = 0;
+			}
+
 			if (sym != null || drc != null || opc != null)
 			{
 				// Find beginning of operand

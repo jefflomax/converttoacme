@@ -22,7 +22,8 @@ namespace acmeconvert
 			//   assurs that directives don't have '#' '$' or '?' as their word boundary
 			// '.* captures comments so their contents don't become opcodes or directives
 
-			var pattern = $@"(^(?<sym>[?]?\w+\:?|\s+\w+\:))?(\b((?<![#$?])([.]?(?<dr>{directives}))|(?<op>{opcodes}))\b)?('.*)?";
+//			var pattern = $@"(^(?<sym>[?]?\w+\:?|\s+\w+\:))?(\b((?<![#$?])([.]?(?<dr>{directives}))|(?<op>{opcodes}))\b)?('.*)?";
+			var pattern = $@"(^(?<sym>[?]?\w+\:?|\s+\w+\:))?(\b((?<op>{opcodes})|(?<![#$?])([.]?(?<dr>{directives})))\b)?('.*)?";
 
 			CompiledRegex = new Regex
 			(

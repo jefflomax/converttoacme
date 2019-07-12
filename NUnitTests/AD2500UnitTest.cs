@@ -47,6 +47,7 @@ namespace NUnitTests
 		[TestCase("  DB 'U;' ","","","DB", " 'U;' ")]
 		[TestCase(" PUBLIC END_OF_TEXT", "", "", "PUBLIC", " END_OF_TEXT")]
 		[TestCase(" EXTERN KEY_RECORD_END","","","EXTERN", " KEY_RECORD_END")]
+		[TestCase(" STA PAGE","","STA","", " PAGE")]
 		[TestCase(" DB 'ALEXANDER, AND THE TIMEWORKS TEAM.    '","","","DB", " 'ALEXANDER, AND THE TIMEWORKS TEAM.    '")]
 		public void AD2500TestOperand( string line, string symbol, string op, string drctv, string operand )
 		{
