@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace acmeconvert
@@ -13,12 +14,14 @@ namespace acmeconvert
 			Settings settings
 		)
 		{
+			var streamReader = new StreamReader(fileToConvert);
 			switch (format)
 			{
 				case Formats.AD2500:
 					return new ADAConvert
 					(
 						fileToConvert,
+						streamReader,
 						settings
 					);
 
@@ -26,6 +29,7 @@ namespace acmeconvert
 					return new MADSConvert
 					(
 						fileToConvert,
+						streamReader,
 						settings
 					);
 
@@ -33,6 +37,7 @@ namespace acmeconvert
 					return new PDSConvert
 					(
 						fileToConvert,
+						streamReader,
 						settings
 					);
 

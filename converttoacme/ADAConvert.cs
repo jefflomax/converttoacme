@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace acmeconvert
@@ -9,8 +10,9 @@ namespace acmeconvert
 		public ADAConvert
 		(
 			string filePath,
+			StreamReader streamReader,
 			Settings settings
-		) : base(filePath, settings)
+		) : base(filePath, streamReader, settings)
 		{
 			_line = new ADALine();
 		}
@@ -28,6 +30,11 @@ namespace acmeconvert
 		public override bool IsSkippedDirective( string directive )
 		{
 			return TokenIs(directive, SkipDirectives);
+		}
+
+		public override string FillDefaultValue()
+		{
+			return ", $FF";
 		}
 	}
 }

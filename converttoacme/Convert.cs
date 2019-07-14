@@ -41,6 +41,7 @@ namespace acmeconvert
 
 		protected bool ZoneSet = false;
 		protected bool emitOriginalLineCommented = false;
+		protected bool bit7Enabled = false;
 
 		public enum PsuedoOp
 		{
@@ -66,11 +67,13 @@ namespace acmeconvert
 		public Convert
 		(
 			string filePath,
+			StreamReader streamReader,
 			Settings settings
 		)
 		{
 			emitOriginalLineCommented = settings.EmitOriginal;
 			moduleHasGlobalSymbolsToRename = false;
+			ZoneSet = ! settings.AutoSetZone;
 			globalSymbolRenames = new string[0];
 			var fileNameAndExtension = Path.GetFileName
 			(
@@ -93,7 +96,7 @@ namespace acmeconvert
 			_publicSymbols = new Dictionary<string, SymbolReference>();
 			_externalSymbols = new Dictionary<string, SymbolReference>();
 
-			file = new StreamReader(filePath);
+			file = streamReader; // new StreamReader(filePath);
 		}
 
 		public void Process()
@@ -335,9 +338,10 @@ namespace acmeconvert
 
 			if (IsBit7(_line.Directive))
 			{
-				// No support for BIT7
 				// This feature is in both 2500AD, PDS
-				CommentOrReportBit7Error(_line.Code, _line.Comment);
+				// There is also DC, which sets the high bit of the
+				// last char in a string (not implemented)
+				ManageBit7(_line.Operand, _line.Code, _line.Comment);
 				return true;
 			}
 
@@ -381,18 +385,26 @@ namespace acmeconvert
 			return false;
 		}
 
-		protected void CommentOrReportBit7Error
+		public virtual void ManageBit7
 		(
+			string operand,
 			string code,
 			string comment
 		)
 		{
-			if (code.Contains("ON", StringComparison.CurrentCultureIgnoreCase))
+			var priorBit7 = bit7Enabled;
+			if (operand.Contains("ON", StringComparison.CurrentCultureIgnoreCase))
 			{
-				//throw new Exception(".BIT7 ON is not supported:{code}");
-				WriteLine(";CONV BIT7 ON not supported");
+				bit7Enabled = true;
 			}
-			Write($";{code}", comment);
+			else
+			{
+				bit7Enabled = false;
+			}
+			if (priorBit7 != bit7Enabled && emitOriginalLineCommented)
+			{
+				Write($";BIT7 {bit7Enabled}{code}", comment);
+			}
 		}
 
 		protected void Write
@@ -945,6 +957,11 @@ namespace acmeconvert
 			return false;
 		}
 
+		public virtual string FillDefaultValue()
+		{
+			return string.Empty;
+		}
+
 		protected bool DBDSDWInfix
 		(
 			string symbol,
@@ -962,17 +979,16 @@ namespace acmeconvert
 				return false;
 			}
 
-			//WriteLine($";CONV sym {symbol} {directive} {operand} {comment}");
+			// Infix writes symbol, newline, then directive
 			WriteLine(symbol);
 			if (op == PsuedoOp.DS)
 			{
-				Write($"!fill {operand}", comment);
+				Write($"!fill {operand}{FillDefaultValue()}", comment);
 			}
 			else if (op == PsuedoOp.DB || op == PsuedoOp.DW)
 			{
 				// Infix DB, can be multi-value
 				// operand is the expressions
-
 				DB
 				(
 					directive,
@@ -1258,7 +1274,7 @@ namespace acmeconvert
 
 
 			// TODO: No need to return trailingComment
-			var (expressions, trailingComment) = CollectExpressions(operand);
+			var (expressions, trailingComment) = CollectExpressions(operand, bit7Enabled);
 			var hasString = expressions.Any(e => e.StartsWith(QUOTE));
 
 			if (IsDW(directive))
@@ -1292,17 +1308,21 @@ namespace acmeconvert
 			string comment
 		)
 		{
-			var pattern = @".*DS\s*([\w$]+).*";
+			var pattern = @".*DS\s*([\w$ +-]+).*";
 			var matches = MatchesNoCase(code, pattern);
 			foreach (Match match in matches)
 			{
 				var fillBytes = match.Groups[1].Value;
 
-				Write($"!fill {fillBytes}", comment);
+				Write($"!fill {fillBytes}{FillDefaultValue()}", comment);
 			}
 		}
 
-		public (List<string>, string) CollectExpressions( string line )
+		public (List<string>, string) CollectExpressions
+		(
+			string line,
+			bool bit7Enabled
+		)
 		{
 			var expressions = new List<string>();
 			var trailingComment = string.Empty;
@@ -1325,8 +1345,8 @@ namespace acmeconvert
 					}
 					else
 					{
-						// String or Char 
-						StringToExpression(TICK, QUOTE, stringOrChar, expression);
+						// String or Char
+						StringToExpression(TICK, QUOTE, stringOrChar, expression, bit7Enabled);
 						stringOrChar.Clear();
 						potentialEos = false;
 						inCharOrString = false;
@@ -1389,7 +1409,7 @@ namespace acmeconvert
 			if (potentialEos)
 			{
 				// End of string was EOL
-				StringToExpression(TICK, QUOTE, stringOrChar, expression);
+				StringToExpression(TICK, QUOTE, stringOrChar, expression, bit7Enabled);
 			}
 
 			if (expression.Length > 0)
@@ -1405,9 +1425,19 @@ namespace acmeconvert
 			char tick,
 			char quote,
 			StringBuilder stringOrChar,
-			StringBuilder expression
+			StringBuilder expression,
+			bool bit7Enabled
 		)
 		{
+			if (bit7Enabled)
+			{	// ACME enables High Bit set only on strings
+				var hexWithHiBitSet = stringOrChar.ToString()
+					.Select(ch => string.Format("${0:X}", ((int)ch) | 128));
+				var result = string.Join(",", hexWithHiBitSet);
+				expression.Append(result);
+				return;
+			}
+
 			if (stringOrChar.Length > 1)
 			{
 				expression.Append($"{quote}{stringOrChar.ToString()}{quote}");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace acmeconvert
@@ -12,8 +13,9 @@ namespace acmeconvert
 		public PDSConvert
 		(
 			string filePath,
+			StreamReader streamReader,
 			Settings settings
-		) : base(filePath, settings)
+		) : base(filePath, streamReader, settings)
 		{
 			_line = new PDSLine();
 
