@@ -2,7 +2,7 @@
 Convert 6502 Assembler source from
 * 2500AD Cross Assembler
 * Commodore Macro Assembler
-* Programmers Development System (PDS) 
+* Programmers Development System (PDS)\
 to ACME Cross Assembler.
 
 ## Written in .NET Core 3, runnable on Windows 10, MacOS, and Linux

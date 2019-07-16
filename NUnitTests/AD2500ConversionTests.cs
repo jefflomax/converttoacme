@@ -25,9 +25,10 @@ namespace NUnitTests
 			_settings.Macros = new List<string>();
 		}
 
-		[TestCase(" DS 120", "!fill 120, $FF")]
-		[TestCase(" DS 120-LENG", "!fill 120-LENG, $FF")]
-		public void TestConvert( string line, string newLine )
+		[TestCase(" DS 120", "!fill 120, $FF","")]
+		[TestCase(" DS 120-LENG", "!fill 120-LENG, $FF","")]
+		[TestCase(".ORG $+SECTION_LENGTH-OVERLAY_SIZE","!initmem $FF", "* = *+SECTION_LENGTH-OVERLAY_SIZE")]
+		public void TestConvert( string line, string newLine, string nextLine )
 		{
 			var stream = MakeSteamReader(line);
 			_convert = new ADAConvert("TEST.ASM", stream, _settings);
@@ -40,9 +41,20 @@ namespace NUnitTests
 
 				_convert.Process();
 
-				var result = sw.ToString().Trim();
+				var stringReader = new StringReader(sw.ToString());
+
+				var result = stringReader.ReadLine().Trim();
 
 				result.ShouldEqual(newLine);
+
+				if (nextLine.Length == 0)
+				{
+					return;
+				}
+
+				result = stringReader.ReadLine().Trim();
+				result.ShouldEqual(nextLine);
+
 			}
 		}
 

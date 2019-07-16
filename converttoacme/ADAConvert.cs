@@ -5,6 +5,9 @@ using System.Text;
 
 namespace acmeconvert
 {
+	// In 2500AS, * = *+SECTION_LENGTH-OVERLAY_SIZE filled with $00
+	// But in ACME it's filling with $FF
+	// !initmem $ff seems like the best solution, added before ORG emit
 	public class ADAConvert : Convert
 	{
 		public ADAConvert
@@ -35,6 +38,11 @@ namespace acmeconvert
 		public override string FillDefaultValue()
 		{
 			return ", $FF";
+		}
+
+		public override void InitMemoryDefaults()
+		{
+			Write("!initmem $FF","");
 		}
 	}
 }

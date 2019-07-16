@@ -820,8 +820,8 @@ namespace acmeconvert
 
 			// .ORG $+SECTION_LENGTH-OVERLAY_SIZE
 			//  ORG  $801
-			// A $ followed by any operator needs to become
-			// a *, a $ followed by a number must be retained
+			// $ followed by any operator needs to become a *
+			// $ followed by a number must be retained
 			var orgPattern = @"^\s*(\.?ORG)\s+";
 			var dollarSignPattern = @"(\$\s*[+-]|\$\s*\d+|\d+)";
 			var matches = MatchesNoCase(code, orgPattern);
@@ -846,8 +846,13 @@ namespace acmeconvert
 						}
 					}
 				}
+				InitMemoryDefaults();
 				Write(new string(chars), comment);
 			}
+		}
+
+		public virtual void InitMemoryDefaults()
+		{
 		}
 
 		protected void CacheSymbolReference
